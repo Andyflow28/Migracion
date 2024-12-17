@@ -39,6 +39,7 @@ def plot_dos():
     plt.grid(True)
     
     # Mostrar el gráfico
+    plt.savefig('images/graph_g.png', dpi=1000) 
     plt.show()
 
 if __name__ == "__main__":

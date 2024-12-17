@@ -16,9 +16,9 @@ def read_data(file_name):
 # Función para graficar los resultados
 def plot_dos():
     # Lista de nombres de archivo de entrada (según la imagen)
-    dos_names = ["density/density_output_000.dat", "density/density_output_001.dat", 
-                 "density/density_output_005.dat", "density/density_output_010.dat", 
-                 "density/density_output_015.dat"]
+    dos_names = ["density/density_output_001.dat", "density/density_output_005.dat", 
+                 "density/density_output_010.dat", "density/density_output_015.dat", 
+                 "density/density_output_020.dat"]
     
     # Crear una figura para el gráfico
     plt.figure(figsize=(10, 6))
@@ -35,10 +35,12 @@ def plot_dos():
     # Configuración del gráfico
     plt.xlabel(r'$\omega$(meV)', fontsize=18)
     plt.ylabel(r'Im($\tilde{\omega})$(meV)', fontsize=18)
+    plt.xlim(0,6.5)
     plt.legend()
     plt.grid(True)
     
     # Mostrar el gráfico
+    plt.savefig('images/densidad.png', dpi=1000) 
     plt.show()
 
 if __name__ == "__main__":

@@ -1,10 +1,11 @@
 import numpy as np
 from scipy.integrate import quad
+from scipy.interpolate import interp1d
 
 # Constantes
 En = -0.4
 Hop_t = -0.2
-N = 50  # Asegurarse de que N no sea mayor que el tamaño de A o B
+N = 50  # Mantener el tamaño de A y B original, pero generar 1000 puntos
 LowerLimitDx = np.pi - np.arccos(En / (4 * Hop_t))
 Delta0 = 24.0 * np.sqrt(2.0)
 
@@ -14,26 +15,21 @@ def load_data(file_name):
     B = []
     with open(file_name, 'r') as f:
         for line in f:
-            # Ignorar líneas vacías
             if not line.strip():
                 continue
             try:
-                # Intenta descomponer la línea en dos valores
                 a, b = map(float, line.split())
                 A.append(a)
                 B.append(b)
             except ValueError:
-                # Si no hay exactamente dos valores en la línea, ignórala
                 print(f"Advertencia: línea malformada encontrada en el archivo {file_name}: {line}")
                 continue
     return np.array(A), np.array(B)
 
-
 # Funciones para el cálculo de DOS
 def func1(x, n, A, B):
-    # Aseguramos que n esté en el rango adecuado
-    n = min(n, len(A) - 1)  # Asegura que n no sea mayor que 49 si el tamaño de A es 50
-    n = max(n, 0)           # Asegura que n no sea menor que 0
+    n = min(n, len(A) - 1)
+    n = max(n, 0)
     
     cos_x = np.cos(x)
     sin_x = np.sqrt(1 - cos_x ** 2)
@@ -60,9 +56,8 @@ def func1(x, n, A, B):
     return result
 
 def func2(x, n, A, B):
-    # Verifica que n no sea mayor que el tamaño de A o B
-    n = min(n, len(A) - 1)  # Asegura que n no sea mayor que 49 si el tamaño de A es 50
-    n = max(n, 0)  # Asegura que n no sea menor que 0
+    n = min(n, len(A) - 1)
+    n = max(n, 0)
     
     cos_x = np.cos(x)
     sin_x = np.sqrt(1 - cos_x ** 2)
@@ -121,13 +116,19 @@ def process_data():
     for i in range(5):
         A, B = load_data(file_names[i])
 
+        # Generar 1000 puntos mediante interpolación
+        interpolator_A = interp1d(np.linspace(0, 1, len(A)), A, kind='cubic')
+        interpolator_B = interp1d(np.linspace(0, 1, len(B)), B, kind='cubic')
+        A_interpolated = interpolator_A(np.linspace(0, 1, 1000))
+        B_interpolated = interpolator_B(np.linspace(0, 1, 1000))
+
         with open(dos_names[i], "w") as dos_file:
-            for n in range(min(N, len(A))):  # Asegúrate de que n no supere el tamaño de A o B
+            for n in range(1000):  # Ahora generamos 1000 datos
                 normalization = romberg_integration(dos_f, LowerLimitDx, np.pi)
-                f = romberg_integration(func1, LowerLimitDx, np.pi, args=(n, A, B))
-                g = romberg_integration(func2, LowerLimitDx, np.pi, args=(n, A, B))
+                f = romberg_integration(func1, LowerLimitDx, np.pi, args=(n, A_interpolated, B_interpolated))
+                g = romberg_integration(func2, LowerLimitDx, np.pi, args=(n, A_interpolated, B_interpolated))
                 DOS = (f + g) / normalization
-                dos_file.write(f"{A[n]}\t{DOS}\n")
+                dos_file.write(f"{A_interpolated[n]}\t{DOS}\n")
 
 if __name__ == "__main__":
     process_data()

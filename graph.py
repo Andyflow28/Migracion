@@ -25,21 +25,22 @@ def plot_dos():
 
     # Colores y etiquetas para los gráficos
     colors = ['b', 'g', 'r', 'c', 'm']
-    labels = ["g=0.0", "g=0.1", "g=0.5", "g=1.0", "g=1.5"]
+    labels = [r"$\Gamma^+=0.00$", r"$\Gamma^+=0.01$", r"$\Gamma^+=0.05$", r"$\Gamma^+=0.10$", r"$\Gamma^+=0.15$"]
     
     # Leer y graficar los datos de cada archivo
     for i, dos_file in enumerate(dos_names):
         A, DOS = read_data(dos_file)
-        plt.plot(A, DOS, label=labels[i], color=colors[i], linestyle='-', marker='o')
+        plt.plot(A, DOS, label=labels[i], color=colors[i], linestyle='-', marker='o', markersize=0.5)
     
     # Configuración del gráfico
-    plt.title('Densidad de Estados (DOS) vs. Energía')
-    plt.xlabel('Energía (MeV)')
-    plt.ylabel('Densidad de Estados (DOS)')
+    plt.title('Densidad de Estados (DoS) vs. Energía', fontsize=18)
+    plt.xlabel('Energía (MeV)', fontsize=18)
+    plt.ylabel('Densidad de Estados (DoS)', fontsize=18)
     plt.legend()
     plt.grid(True)
     
     # Mostrar el gráfico
+    plt.savefig('images/graph.png', dpi=1000) 
     plt.show()
 
 if __name__ == "__main__":
